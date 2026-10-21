@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signed() { return request.auth != null; }
+  function game(id) { return get(/databases/$(database)/documents/games/$(id)).data; }
+  function participant(id) { return signed() && request.auth.uid in game(id).members; }
+  function readPlan(id, round, uid) {
+   let g = game(id);
+   return signed() && request.auth.uid in g.members && (request.auth.uid == uid
+    || (g.round == round && g.submitted.size() == 2)
+    || exists(/databases/$(database)/documents/games/$(id)/rounds/$(round))
+    || existsAfter(/databases/$(database)/documents/games/$(id)/rounds/$(round)));
+  }
+  function createReplay(id, round) {
+   let g = game(id);
+   let next = getAfter(/databases/$(database)/documents/games/$(id)).data;
+   return signed() && request.auth.uid in g.members && g.status == 'active' && g.round == round
+    && g.submitted.size() == 2 && request.resource.data.revision == g.state.revision
+    && next.state.revision == g.state.revision + 1;
+  }
+  function createPlan(id, round, uid) {
+   let g = game(id);
+   let next = getAfter(/databases/$(database)/documents/games/$(id)).data;
+   return signed() && request.auth.uid in g.members && request.auth.uid == uid && g.status == 'active'
+    && g.round == round && request.resource.data.uid == uid && request.resource.data.round == round
+    && request.resource.data.plan.size() == 3 && uid in next.submitted;
+  }
+  match /profiles/{uid} {
+   allow read, write: if signed() && request.auth.uid == uid;
+  }
+  match /games/{id} {
+   // Direct lookup of a short room code is permitted for joining, but rooms cannot be listed publicly.
+   allow get: if signed() && (resource == null || resource.data.status == 'waiting' || request.auth.uid in resource.data.members);
+   allow list: if signed() && request.auth.uid in resource.data.members;
+   allow create: if signed() && request.resource.data.creator == request.auth.uid
+    && request.resource.data.members == [request.auth.uid]
+    && request.resource.data.coaches.size() == 1 && request.resource.data.status == 'waiting'
+    && request.resource.data.state.revision == 0 && request.resource.data.submitted == [];
+   allow update: if signed() && request.resource.data.creator == resource.data.creator
+    && request.resource.data.id == resource.data.id && request.resource.data.createdAt == resource.data.createdAt
+    && (
+     (resource.data.status == 'waiting' && resource.data.members.size() == 1
+      && !(request.auth.uid in resource.data.members) && request.resource.data.status == 'active'
+      && request.resource.data.members == resource.data.members.concat([request.auth.uid])
+      && request.resource.data.coaches.size() == 2
+      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','coaches','status']))
+     || (request.auth.uid in resource.data.members && request.resource.data.members == resource.data.members
+      && request.resource.data.coaches == resource.data.coaches && (
+       (resource.data.status == 'waiting' && request.auth.uid == resource.data.creator
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+       || (resource.data.status == 'active' && request.resource.data.status == 'active'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['submitted'])
+        && !(request.auth.uid in resource.data.submitted)
+        && request.resource.data.submitted == resource.data.submitted.concat([request.auth.uid])
+        && existsAfter(/databases/$(database)/documents/games/$(id)/rounds/$(resource.data.round)/plans/$(request.auth.uid)))
+       || (resource.data.status == 'active' && resource.data.submitted.size() == 2
+        && request.resource.data.state.revision == resource.data.state.revision + 1
+        && request.resource.data.submitted == []
+        && request.resource.data.status in ['active','completed']
+        && existsAfter(/databases/$(database)/documents/games/$(id)/rounds/$(resource.data.round)))
+       || (resource.data.status == 'active' && request.resource.data.status == 'completed'
+        && request.resource.data.result.forfeit == true
+        && request.resource.data.result.winner == (request.auth.uid == resource.data.members[0] ? 1 : 0)
+        && request.resource.data.result.score == resource.data.state.score
+        && request.resource.data.result.stats == resource.data.state.stats
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','result','finishedAt']))
+      ))
+    );
+   allow delete: if false;
+   match /rounds/{round} {
+    allow read: if participant(id);
+    allow create: if createReplay(id, round);
+    allow update, delete: if false;
+    match /plans/{uid} {
+     // Hidden even from the other participant until both committed. Immutable thereafter.
+     allow read: if readPlan(id, round, uid);
+     allow create: if createPlan(id, round, uid);
+     allow update, delete: if false;
+    }
+   }
+  }
+  match /results/{id} {
+   // Only signed-in friends in this Firebase project can read the friend-group board.
+   allow read: if signed();
+   allow create: if participant(id)
+    && getAfter(/databases/$(database)/documents/games/$(id)).data.status == 'completed'
+    && request.resource.data.result == getAfter(/databases/$(database)/documents/games/$(id)).data.result
+    && request.resource.data.members == game(id).members
+    && request.resource.data.coaches == game(id).coaches && request.resource.data.gameId == id
+    && request.resource.data.status == 'completed';
+   allow update, delete: if false;
+  }
+  match /{document=**} { allow read, write: if false; }
+ }
+}

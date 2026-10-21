@@ -1,0 +1,18 @@
+{
+  "name": "football-strategy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test engine.test.mjs backend.test.mjs",
+    "simulate": "node simulate.mjs",
+    "test:rules": "firebase emulators:exec --project demo-football-strategy --only firestore \"node security.test.mjs\"",
+    "test:ui": "node ui.test.mjs"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "5.0.0",
+    "firebase": "12.4.0",
+    "firebase-tools": "14.18.0",
+    "linkedom": "0.18.13"
+  }
+}
