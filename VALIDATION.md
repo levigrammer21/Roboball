@@ -1,18 +1,18 @@
-# Football Strategy 1.0.0 · validation report
+# Football Strategy 1.1.0 · validation report
 
 ## Executed successfully
 
 | Check | Result |
 | --- | --- |
-| Dependency-free engine and protocol suite | **37 passed, 0 failed** |
-| Actual Firestore emulator security/concurrency suite | **17 passed** |
-| Node DOM interaction suite | **11 passed** |
+| Dependency-free engine and protocol suite | **38 passed, 0 failed** |
+| Actual Firestore emulator security/concurrency suite | **20 passed** |
+| Node DOM interaction suite | **14 passed** |
 | Complete-game simulations | **120 of 120 completed** |
 | Simulated resolved downs | **3,174**, maximum **93** in one game |
 | JavaScript module syntax | Passed |
 | ZIP structure / source inclusion | One project folder; application files at its root |
 
-The simulation uses deterministic purposeful AI with seeded legal action variation (22% of actions are varied) to exercise different results. Every resolved state checks field bounds, six unique player positions, a valid carrier, down bounds, revision progress, nonnegative multiples-of-seven scores and agreement between scores and TD stats. Completed games require equal scheduled opportunities and a non-tied score. The simulation's 400-down harness safety limit is not a game rule; all 120 varied games finished before it. Perfectly mirrored deterministic coaches can remain tied through repeated overtime, which the rules intentionally allow.
+The engine is unchanged in 1.1; the 120-game simulation result below is retained from 1.0 validation. The simulation uses deterministic purposeful AI with seeded legal action variation (22% of actions are varied) to exercise different results. Every resolved state checks field bounds, six unique player positions, a valid carrier, down bounds, revision progress, nonnegative multiples-of-seven scores and agreement between scores and TD stats. Completed games require equal scheduled opportunities and a non-tied score. The simulation's 400-down harness safety limit is not a game rule; all 120 varied games finished before it. Perfectly mirrored deterministic coaches can remain tied through repeated overtime, which the rules intentionally allow.
 
 ## Engine/protocol coverage
 
@@ -20,7 +20,7 @@ Cardinal movement and boundaries; three-turn sequencing; retained positions; eig
 
 ## Real emulator coverage
 
-The supplied rules were compiled and run in the official Firestore emulator with separate Alice, Bob, outsider and unauthenticated contexts. The production Firebase project was not contacted by these tests.
+The 1.1 rules include participant-scoped jersey edits, range/uniqueness checks and denial of opponent edits. The supplied rules were compiled and run in the official Firestore emulator with separate Alice, Bob, outsider and unauthenticated contexts. The production Firebase project was not contacted by these tests.
 
 Verified: anonymous denial; transaction creation; room-code lookup and restricted listing; joining; participant-only active state/replays; participant queries; first-plan secrecy; immutable/owner-only submissions; reveal after both commits; two concurrent resolvers advance once; old replay/plan immutability; stale submissions; concurrent next-down submissions; atomic forfeit/result creation; authenticated summary board; immutable completed results; creator-only cancellation; and ordinary final-down result publication.
 
@@ -28,7 +28,7 @@ The emulator exposed stale-write rule denials during concurrency. The client now
 
 ## Interface interaction coverage
 
-Executed in a Node DOM environment using the actual app source: home actions; practice without Firebase browser imports; player selection; legal squares; movement arrows; undo; pass gesture/path squares; projected ball carrier and receiver position; unsubmitted draft restoration after module reload; review/lock; replay persistence; refresh before viewing a result; skip/continue without changing saved scores/replay count; and replay archive navigation.
+Executed in a Node DOM environment using the actual app source: home actions; practice without Firebase browser imports; player selection; legal squares; movement arrows; undo; pass gesture/path squares; projected ball carrier and receiver position; unsubmitted draft restoration after module reload; direct Finish submission and automatic playback; replay persistence; refresh before viewing a result; skip/continue without changing saved scores/replay count; jersey validation, number persistence, automatic advance to planning, and replay archive navigation.
 
 These are DOM interaction checks, **not real-browser rendering or physical touch tests**.
 

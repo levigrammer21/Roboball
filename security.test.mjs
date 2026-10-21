@@ -17,6 +17,9 @@ try{
  await check('joining appends the joining participant',async()=>{await ok(updateDoc(ref(b),{members:['alice','bob'],coaches:[{uid:'alice',name:'Alice',color:'#54ddad'},{uid:'bob',name:'Bob',color:'#ffb56d'}],status:'active'}));});
  await check('active state and replays private to participants',async()=>{await no(getDoc(ref(x)));await no(getDocs(collection(x,'games','ABCDEFG','rounds')));});
  await check('participant game query works',async()=>{let q=await ok(getDocs(query(collection(a,'games'),where('members','array-contains','alice'))));assert.equal(q.size,1);});
+ await check('participants edit their own jersey numbers',async()=>{await ok(updateDoc(ref(a),{uniforms:{alice:[21,7,99]}}));await ok(updateDoc(ref(b),{uniforms:{alice:[21,7,99],bob:[3,8,12]}}));});
+ await check('uniform numbers enforce ranges and uniqueness',async()=>{await no(updateDoc(ref(a),{uniforms:{alice:[7,7,12],bob:[3,8,12]}}));await no(updateDoc(ref(a),{uniforms:{alice:[-1,4,100],bob:[3,8,12]}}));});
+ await check('opponents and outsiders cannot alter another uniform',async()=>{await no(updateDoc(ref(a),{uniforms:{alice:[21,7,99],bob:[4,8,12]}}));await no(updateDoc(ref(x),{uniforms:{alice:[1,2,3]}}));});
  const round=key(newGame());
  async function submit(db,uid,r=round){return transact(db,async(tx,g)=>{let p=validateSubmission(g,uid,r,emptyPlan()),old=await tx.get(pr(db,r,uid));if(old.exists())return;tx.set(pr(db,r,uid),{uid,round:r,plan:p});tx.update(ref(db),{submitted:[...g.submitted,uid]});});}
  await check('first committed plan stays secret',async()=>{await ok(submit(a,'alice'));await ok(getDoc(pr(a,round,'alice')));await no(getDoc(pr(b,round,'alice')));await no(getDoc(pr(x,round,'alice')));});

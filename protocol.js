@@ -15,7 +15,7 @@ export function completedResult(g){return {gameId:g.id,members:g.members,coaches
 // Some SDK/emulator rule checks report a stale concurrent write as permission-denied
 // before the SDK's usual ABORTED retry. Retry only when the canonical game changed;
 // a genuine rules denial against the same game is surfaced immediately.
-export const transactionFingerprint=g=>g?`${g.round}|${g.status}|${g.submitted.join(',')}`:'missing';
+export const transactionFingerprint=g=>g?`${g.round}|${g.status}|${g.submitted.join(',')}|${JSON.stringify(g.uniforms||{})}`:'missing';
 export async function guardedTransaction(run,readLatest,work){
  for(let attempt=0;attempt<5;attempt++){let observed;
   try{return await run(async(tx,g)=>{observed=transactionFingerprint(g);return work(tx,g);});}

@@ -1,3 +1,7 @@
+# Updating from 1.0.0
+
+Replace the app files and **publish the updated firestore.rules** once. The new rules allow each coach to edit only their own jersey numbers. Existing accounts, games, drafts and records remain compatible. Tap **Jerseys** above the field to pick three unique numbers (0–99). No database reset is needed.
+
 # Set up Football Strategy on your phone
 
 Your Firebase project `footballstratagy` is already configured in the code. The following console steps still need to be completed by the project owner. They have not been performed for you.
@@ -24,12 +28,12 @@ The friend group is everyone with an account in this Firebase project. Signed-in
 
 ## 3. Upload to GitHub
 
-1. Unzip **Football-Strategy-v1.0.0.zip**. It contains one folder named **Football-Strategy-v1.0.0**.
+1. Unzip **Football-Strategy-v1.1.0.zip**. It contains one folder named **Football-Strategy-v1.1.0**.
 2. Open your repository on GitHub. Upload the **files inside that folder** to the repository root. Do not upload the surrounding folder as another nested directory.
 3. Confirm that `index.html`, `app.js`, `engine.js`, `cloud.js` and `style.css` are directly in the root.
 4. Open **Settings → Pages**. Under deployment source, choose **Deploy from a branch**, select your branch (usually `main`) and **/(root)**. Save.
 5. Open the URL GitHub supplies, usually `https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/`.
-6. Allow a little time after uploading; reload if GitHub is still serving an earlier version. Version **1.0.0** is visible at the top.
+6. Allow a little time after uploading; reload if GitHub is still serving an earlier version. Version **1.1.0** is visible at the top.
 
 The source uses relative local paths, so repository URLs work. Firebase modules load from Google's CDN, and optional fonts load from Google Fonts. Font failures fall back to system fonts. Practice uses only local game code and does not depend on Firebase sign-in; the initial site files must still have loaded. This release does not include a service worker or promise a first load without internet.
 
@@ -38,9 +42,9 @@ The source uses relative local paths, so repository URLs work. Firebase modules 
 1. Coach A signs in and chooses **Create game → Create room**.
 2. Copy the seven-character room code or invitation link.
 3. Coach B signs into a different account, chooses **Join game** and enters the code, or opens the invitation link.
-4. Both coaches program three turns and choose **Review & lock → Lock all three turns**.
+4. Both coaches program three turns and choose **Finish**.
 5. The last submission triggers resolution. The other client also attempts a guarded resolution if needed; only one transaction can advance that down.
-6. Watch or skip the replay, then continue. You can leave between submissions and come back later.
+6. Playback starts automatically when both coaches finish. When playback ends, the next down opens automatically. Skip is also available. You can leave between submissions and come back later.
 
 An unfinished plan is device-local and scoped to the exact room, possession and down. Submitted plans and game results sync through Firestore. Local drafts are not shared across devices. Completed games are under Records/history; practice never changes records.
 

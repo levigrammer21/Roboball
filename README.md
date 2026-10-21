@@ -1,8 +1,18 @@
-# Football Strategy · 1.0.0
+# Football Strategy · 1.1.0
 
 A complete, buildless, mobile-first football strategy game for a small group of friends. Program three players for three simultaneous turns. Read the defense, time a pass, and find the end zone.
 
 **Start with [START-HERE.html](START-HERE.html) or [SETUP.md](SETUP.md).**
+
+## New in 1.1.0
+
+- Little football players with helmets, shoulder pads, jerseys, pants and cleats.
+- Custom numbers through the **Jerseys** button, saved for each coach and visible to both sides.
+- **Next turn → Next turn → Finish**, with no submission confirmation dialog.
+- Automatic playback when both coaches finish, followed by the next planning down.
+- Speed-aware movement transitions, running poses and shorter pauses.
+
+Publish the updated `firestore.rules` when replacing the app files. Existing matches are compatible.
 
 ## Play
 
@@ -13,7 +23,7 @@ A complete, buildless, mobile-first football strategy game for a small group of 
 
 ## Included
 
-- Touch planning with projected positions, paths, legal-square highlights, pass mode, undo, hold, turn editing, clearing, and final review.
+- Touch planning with projected positions, paths, legal-square highlights, pass mode, undo, hold, turn editing, clearing, and direct Finish submission.
 - Deterministic shared rules, simultaneous contact, supercover passes, conservative breakaway search, paired overtime.
 - Firebase email accounts, profiles, room codes, invitation links, asynchronous games, locked secret plans, transactional resolution, cancellation and forfeits.
 - Saved replay events, speed/skip controls, archived game film, active/completed lists, derived records and head-to-head leaderboard.

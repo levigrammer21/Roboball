@@ -1,3 +1,4 @@
+import {normalizeNumbers,validNumbers} from './visuals.js';
 import {newGame,key} from './engine.js';
 import {validateSubmission,resolutionPatch,completedResult,guardedTransaction} from './protocol.js';
 export const firebaseConfig={apiKey:'AIzaSyBOdWtkh5akzvlPABTxDwpZXR9usS-UOBg',authDomain:'footballstratagy.firebaseapp.com',projectId:'footballstratagy',storageBucket:'footballstratagy.firebasestorage.app',messagingSenderId:'762483899216',appId:'1:762483899216:web:00c1c89a5cfa77f98b0a55'};
@@ -9,13 +10,14 @@ export async function connect(){
  const app=A.initializeApp(firebaseConfig),db=F.getFirestore(app),auth=U.getAuth(app);
  const ref=id=>F.doc(db,'games',id),rr=(id,round)=>F.doc(db,'games',id,'rounds',round),pr=(id,round,uid)=>F.doc(db,'games',id,'rounds',round,'plans',uid);
  const transact=(id,work)=>guardedTransaction(cb=>F.runTransaction(db,async tx=>{let snap=await tx.get(ref(id));return cb(tx,snap.exists()?snap.data():null);}),async()=>{let snap=await F.getDoc(ref(id));return snap.exists()?snap.data():null;},work);
- const profile=(user,p)=>({uid:user.uid,name:String(p.name||'Coach').trim().slice(0,24)||'Coach',color:/^#[0-9a-f]{6}$/i.test(p.color)?p.color:'#54ddad'});
+ const profile=(user,p)=>({uid:user.uid,name:String(p.name||'Coach').trim().slice(0,24)||'Coach',color:/^#[0-9a-f]{6}$/i.test(p.color)?p.color:'#54ddad',numbers:normalizeNumbers(p.numbers)});
  async function publish(tx,g){tx.set(F.doc(db,'results',g.id),completedResult(g));}
  api={auth,
  onAuth:cb=>U.onAuthStateChanged(auth,cb),
  async account(email,password,signup){return signup?U.createUserWithEmailAndPassword(auth,email,password):U.signInWithEmailAndPassword(auth,email,password);},
  signOut:()=>U.signOut(auth),reset:email=>U.sendPasswordResetEmail(auth,email),
  async saveProfile(p){let v=profile(auth.currentUser,p);await F.setDoc(F.doc(db,'profiles',v.uid),v);return v;},
+ async saveNumbers(id,numbers){if(!validNumbers(numbers))throw Error('Use three unique numbers from 0 to 99.');let uid=auth.currentUser.uid;await transact(id,async(tx,g)=>{if(!g||!g.members.includes(uid))throw Error('Not a participant');tx.update(ref(id),{uniforms:{...(g.uniforms||{}),[uid]:numbers}});});await F.setDoc(F.doc(db,'profiles',uid),{numbers},{merge:true});},
  async getProfile(){let d=await F.getDoc(F.doc(db,'profiles',auth.currentUser.uid));return d.exists()?d.data():null;},
  async create(p){let uid=auth.currentUser.uid;
  for(let attempt=0;attempt<6;attempt++){let bytes=crypto.getRandomValues(new Uint8Array(7));let code=Array.from(bytes,n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%32]).join('');let g={id:code,members:[uid],coaches:[profile(auth.currentUser,p)],creator:uid,status:'waiting',round:key(newGame()),state:newGame(),submitted:[],result:null,createdAt:Date.now(),finishedAt:0};

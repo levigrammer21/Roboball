@@ -25,6 +25,11 @@ service cloud.firestore {
     && g.round == round && request.resource.data.uid == uid && request.resource.data.round == round
     && request.resource.data.plan.size() == 3 && uid in next.submitted;
   }
+  function jerseyNumbers(v) {
+   return v is list && v.size() == 3 && v[0] is int && v[1] is int && v[2] is int
+    && v[0] >= 0 && v[0] <= 99 && v[1] >= 0 && v[1] <= 99 && v[2] >= 0 && v[2] <= 99
+    && v[0] != v[1] && v[0] != v[2] && v[1] != v[2];
+  }
   match /profiles/{uid} {
    allow read, write: if signed() && request.auth.uid == uid;
   }
@@ -44,6 +49,10 @@ service cloud.firestore {
       && request.resource.data.members == resource.data.members.concat([request.auth.uid])
       && request.resource.data.coaches.size() == 2
       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','coaches','status']))
+     || (request.auth.uid in resource.data.members
+      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uniforms'])
+      && request.resource.data.uniforms.diff(resource.data.get('uniforms', {})).affectedKeys().hasOnly([request.auth.uid])
+      && jerseyNumbers(request.resource.data.uniforms[request.auth.uid]))
      || (request.auth.uid in resource.data.members && request.resource.data.members == resource.data.members
       && request.resource.data.coaches == resource.data.coaches && (
        (resource.data.status == 'waiting' && request.auth.uid == resource.data.creator

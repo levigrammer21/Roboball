@@ -1,4 +1,4 @@
-# Football Strategy 1.0.0 · rules and interpretations
+# Football Strategy 1.1.0 · rules and interpretations
 
 ## The contest
 
@@ -12,7 +12,7 @@ Each coach gets three scheduled offensive possessions, alternating A/B/A/B/A/B. 
 
 Each player has one instruction per turn: up, down, left, right, hold or (for a current carrier) pass. Movement is exactly one cardinal square and clamps at the field boundary. Unassigned or invalidated instructions hold. Later projected positions reflect only your own plan and same-team destination cancellation; they cannot predict opposing contact. An instruction names a direction, not an absolute destination, so if earlier contact changed a player's position, later legal instructions apply from the actual position.
 
-Tap a player, then an adjacent highlighted square. To pass, select the projected carrier, enter Pass mode and tap a teammate. Turn tabs, undo and clearing are available until submission. The final review locks all three turns. The stored draft and its review bind to the exact game, possession, down and revision. An old review cannot submit a newer down.
+Tap a player, then an adjacent highlighted square. To pass, select the projected carrier, enter Pass mode and tap a teammate. Turn tabs, undo and clearing are available until submission. Tap Next turn twice, then Finish. Unassigned players hold. The direct Finish submission locks all three turns. The stored draft and its review bind to the exact game, possession, down and revision. An old review cannot submit a newer down.
 
 ## Turn sequence
 

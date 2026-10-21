@@ -6,3 +6,20 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 .cell.intercept-risk{background:#fa7c615c;box-shadow:inset 0 0 0 2px #ffc09f}
+/* 1.1 uniforms and smooth playback */
+.piece,.piece.enemy{width:10%;height:8.333%;border:0;border-radius:0;background:transparent;box-shadow:none;filter:drop-shadow(0 2px 1px #05120b80);will-change:left,top;transition-property:left,top;transition-timing-function:cubic-bezier(.24,.55,.38,1)}
+.piece.selected{outline:none;box-shadow:none;filter:drop-shadow(0 0 4px #e9fff6)}
+.piece.selected:after{content:'';position:absolute;inset:4% 7%;border:2px solid white;border-radius:12px;z-index:-1;background:#a5ffd522}
+.piece.blocked{filter:saturate(.35);box-shadow:none}
+.piece.blocked:after{z-index:2;right:-2px;top:0;width:16px;height:16px;background:#263a3a;border-radius:50%;border:1px solid #e2eee6}
+.piece.ball:before{z-index:3;right:-1px;bottom:14%;width:13px;height:9px;box-shadow:0 1px 5px #0009}
+.athlete{width:100%;height:100%;overflow:visible;pointer-events:none;transform-origin:50% 70%}
+.running .upper-body{animation:uniform-bob .25s ease-in-out infinite alternate;transform-origin:30px 36px}
+.running .leg-left{animation:cleat-left .25s ease-in-out infinite alternate;transform-origin:23px 46px}
+.running .leg-right{animation:cleat-right .25s ease-in-out infinite alternate;transform-origin:37px 46px}
+@keyframes uniform-bob{from{transform:translateY(0)}to{transform:translateY(-1.8px)}}
+@keyframes cleat-left{from{transform:rotate(-12deg) translateY(-1px)}to{transform:rotate(13deg) translateY(1px)}}
+@keyframes cleat-right{from{transform:rotate(12deg) translateY(1px)}to{transform:rotate(-13deg) translateY(-1px)}}
+.number-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.number-grid input{text-align:center;font:700 28px 'Barlow Condensed',sans-serif}
+.extra-controls{margin:12px 0 4px;color:var(--muted);font-size:11px}.extra-controls summary{cursor:pointer;padding:9px 0;min-height:32px}
+@media(prefers-reduced-motion:reduce){.running .upper-body,.running .leg{animation:none!important}}
